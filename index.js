@@ -104,8 +104,11 @@ function sendWeeklyStats(remover) {
 	graph.setTitle("This Week's statistics!");
 	graph.addData(data, 'Messages', '000000');
 	graph.addAxisLabels('x', ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])
-	console.log(graph.getUrl(true));
-	client.channels.get(config.statsChannel).sendEmbed(new Discord.RichEmbed().setImage(graph.getUrl(true)).setURL(graph.getUrl(true)).addField("title", "This Week's Statistics"));
+	graph.setHostname('image-charts.com');
+	graph.setHeight(350);
+	graph.setWidth(500);
+
+	client.channels.get(config.statsChannel).sendFile(graph.getUrl(true), "week_statistics.png");
 
 	if(remover){
 		for(key in messages.week){
