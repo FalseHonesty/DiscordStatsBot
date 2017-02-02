@@ -12,6 +12,7 @@
     "discord.js": "^11.0.0",
     "google-url": "0.0.4",
     "jsonfile": "^2.4.0",
+    "later": "^1.2.0",
     "quiche": "^0.2.0"
   }
 }

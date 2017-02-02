@@ -3,6 +3,7 @@ var Discord = require('discord.js');
 var quiche = require('quiche');
 var client = new Discord.Client();
 var config = jsonfile.readFileSync('config.json');
+var later = require('later');
 var messages = {
 	hour: 0,
 	day: {
@@ -21,17 +22,17 @@ var messages = {
 
 client.login(config.key);
 
-setInterval(function () {
+var hourly = later.setInterval(function () {
 	collectHourlyStats();
-}, 1000*60*60);
+}, later.parse.cron('0 * * * *'));
 
-setInterval(function () {
+var daily = later.setInterval(function () {
 	sendDailyStats(true);
-}, 1000*60*60*24);
+}, later.parse.cron('0 23 * * 0'));
 
-setInterval(function () {
+var weekly = later.setInterval(function () {
 	sendWeeklyStats(true);
-}, 1000*60*60*24*7);
+}, later.parse.cron('0 23 * * *'));
 
 client.on('ready', () => {
 	console.log("Ready!");
@@ -76,7 +77,7 @@ function sendDailyStats(remover) {
 	graph.addData(data, 'Messages', '000000');
 	var hours = [];
 	for(var i = 0; i < 24; i++){
-		hours.push(i + "0:00");
+		hours.push(i + ":00");
 	}
 	graph.addAxisLabels('x', hours)
 	graph.setHostname('image-charts.com');
@@ -86,8 +87,12 @@ function sendDailyStats(remover) {
 	client.channels.get(config.statsChannel).sendFile(graph.getUrl(true), "day_statistics.png");
 
 	if(remover){
-		messages.week["day" + new Date().getDay()] = 0;
 		messages.day.total = 0;
+		for (key in messages.day){
+			if (key != "total"){
+				messages.day[key] = 0;
+			}
+		}
 	}
 }
 
